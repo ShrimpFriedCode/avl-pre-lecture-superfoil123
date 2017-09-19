@@ -37,10 +37,12 @@ public class BSTWithHeightTest {
             T.insert(A[i]);
             H.add(A[i]);
         }
+
         for (int i = 0; i != A.length; ++i) {
             T.remove(A[i]);
             assertFalse(T.find(A[i]));
         }
+
     }
 
     @Test

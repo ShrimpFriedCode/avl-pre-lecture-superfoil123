@@ -4,13 +4,13 @@ import static java.lang.Math.abs;
 class BSTNode<T extends Comparable<T>> {
     T key;
     BSTNode<T> left, right;
-    int height;
+    int height = 0;
 
     BSTNode(T k, BSTNode<T> l, BSTNode<T> r) {
         key = k;
         left = l;
         right = r;
-        height = 0;
+        setHeight(); //set height of node
     }
 
     boolean insert(T k) {
@@ -19,17 +19,40 @@ class BSTNode<T extends Comparable<T>> {
             if (left == null) {
                 left = new BSTNode<T>(k, null, null);
                 inserted = true;
-            } else
+            } else {
                 inserted = left.insert(k);
+            }
         } else if (k.compareTo(key) > 0) {
             if (right == null) {
                 right = new BSTNode<>(k, null, null);
                 inserted = true;
-            } else
+            } else {
                 inserted = right.insert(k);
+            }
         } else
             inserted = false;
+        setHeight(); //renew heights of node after insert
         return inserted;
+    }
+
+    int setHeightH(BSTNode<T> n){
+
+        if (n != null){ //if not null, add 1
+            if(setHeightH(n.left) > setHeightH(n.right)){ //if  get max of either the left or right, to find the true height
+                return setHeightH(n.left) +1;
+            }
+            else{
+                return setHeightH(n.right) + 1;
+            }
+        }
+        else { //else it DNE, so 0
+            return 0;
+        }
+
+    }
+
+    void setHeight(){
+        height = setHeightH(this); //get height of this node
     }
 
 }
@@ -48,8 +71,9 @@ public class BSTWithHeight<T extends Comparable<T>> {
     void insert(T key) {
         if (root == null) {
             root = new BSTNode<>(key, null, null);
-        } else
+        } else {
             root.insert(key);
+        }
     }
 
     void remove(T key) {
@@ -58,12 +82,34 @@ public class BSTWithHeight<T extends Comparable<T>> {
 
     // student implements
     int height() {
-        throw new UnsupportedOperationException();
+        return root.height; //return root's height
+    }
+
+    int heightHelper(BSTNode<T> n){ //for use by isAVL. Not sure if 100% necessary, but helps me visualize
+        if (n != null) {//if not null, it has a height
+            return n.setHeightH(n);
+        }
+        else
+            return 0;//else, it has no height
     }
 
     // student implements
-    boolean isAVL() {
-        throw new UnsupportedOperationException();
+    boolean isAVLH(BSTNode<T> n) {//isAVL helper
+        if(n == null){
+            return true;//if null, must be balanced
+        }
+        else if(((heightHelper(n.left)) - (heightHelper(n.right))) <= 1 && ((heightHelper(n.left)) - (heightHelper(n.right))) >= -1){
+            //By def of AVL, height differences of branches must be between -1 to 1
+            if(isAVLH(n.left) && isAVLH(n.right)){
+                //verify that ALL branches in tree are balanced
+                return true;
+            }
+        }
+        return false; //else, must be false
+    }
+
+    boolean isAVL(){
+        return isAVLH(root); //determine if root node and children are AVL
     }
 
     public void print_tree() { System.out.print(tree_to_string(root)); }
